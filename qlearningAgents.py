@@ -159,22 +159,30 @@ class ApproximateQAgent(PacmanQAgent):
     PacmanQAgent.__init__(self, **args)
 
     # You might want to initialize weights here.
-    "*** YOUR CODE HERE ***"
+    self.w = util.Counter()
+
 
   def getQValue(self, state, action):
     """
       Should return Q(state,action) = w * featureVector
       where * is the dotProduct operator
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    sum = 0
+    feature_dict = self.featExtractor.getFeatures(state, action)
+
+    for feature in feature_dict.keys():
+        sum += feature_dict[feature] * self.w[feature]
+    return sum
 
   def update(self, state, action, nextState, reward):
     """
        Should update your weights based on transition
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    correction = (reward + self.discount * self.getValue(nextState)) - self.getQValue(state, action)
+    feature_dict = self.featExtractor.getFeatures(state, action)
+
+    for feature in feature_dict.keys():
+        self.w[feature] += self.alpha * correction * feature_dict[feature]
 
   def final(self, state):
     "Called at the end of each game."
