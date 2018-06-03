@@ -57,7 +57,9 @@ class QLearningAgent(ReinforcementAgent):
       terminal state, you should return a value of 0.0.
     """
     legal_actions = self.getLegalActions(state)
-    max_val = 0
+    max_val = -float("inf")
+    if len(legal_actions) == 0:
+        return 0
     for action in legal_actions:
         if self.getQValue(state, action) > max_val:
             max_val = self.getQValue(state, action)
