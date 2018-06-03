@@ -35,8 +35,56 @@ class ValueIterationAgent(ValueEstimationAgent):
     self.discount = discount
     self.iterations = iterations
     self.values = util.Counter() # A Counter is a dict with default 0
-     
-    "*** YOUR CODE HERE ***"
+    self.policy = util.Counter()
+    self.q_value = util.Counter()
+
+    for k in range(iterations):
+      previous_values = self.values.copy()
+      previous_q = self.q_value.copy()
+      for state in mdp.getStates():
+
+        possible_actions = mdp.getPossibleActions(state)
+        max_val = 0
+        for action in possible_actions:
+          prob = mdp.getTransitionStatesAndProbs(state, action)
+          sum = 0
+          q_val = 0
+
+          for nextState in prob:
+            reward = mdp.getReward(state, action, nextState[0])
+            previous = discount * previous_values[nextState[0]]
+            sum += (reward + previous) * nextState[1]
+
+            list_q = []
+
+            possible_actions2 = self.mdp.getPossibleActions(nextState[0])
+            for q_act in possible_actions2:
+                  list_q.append(previous_q[(nextState, q_act)])
+            if list_q.__len__() == 0:
+                previous_q_val = 0
+            else:
+                previous_q_val = discount * max(list_q)
+            q_val = (reward + previous_q_val) * nextState[1]
+
+          if max_val < sum:
+            max_val = sum
+
+          self.q_value[(state, action)] = q_val
+          self.values[state] = max_val
+
+    for state in mdp.getStates():
+        list = util.Counter()
+        possible_actions = mdp.getPossibleActions(state)
+        for action in possible_actions:
+            prob = mdp.getTransitionStatesAndProbs(state, action)
+            sum = 0
+            for nextState in prob:
+                reward = mdp.getReward(state, action, nextState[0])
+                previous = discount * self.values[nextState[0]]
+                sum += (reward + previous) * nextState[1]
+            list[action] = sum
+
+        self.policy[state] = list.argMax()
     
   def getValue(self, state):
     """
@@ -52,8 +100,7 @@ class ValueIterationAgent(ValueEstimationAgent):
       necessarily create this quantity and you may have
       to derive it on the fly.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return self.q_value[(state,action)]
 
   def getPolicy(self, state):
     """
@@ -63,8 +110,7 @@ class ValueIterationAgent(ValueEstimationAgent):
       there are no legal actions, which is the case at the
       terminal state, you should return None.
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    return self.policy[state]
 
   def getAction(self, state):
     "Returns the policy at the state (no exploration)."
