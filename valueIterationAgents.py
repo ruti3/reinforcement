@@ -44,7 +44,7 @@ class ValueIterationAgent(ValueEstimationAgent):
       for state in mdp.getStates():
 
         possible_actions = mdp.getPossibleActions(state)
-        max_val = 0
+        max_val = -float("inf")
         for action in possible_actions:
           prob = mdp.getTransitionStatesAndProbs(state, action)
           sum = 0
@@ -59,11 +59,11 @@ class ValueIterationAgent(ValueEstimationAgent):
 
             possible_actions2 = self.mdp.getPossibleActions(nextState[0])
             for q_act in possible_actions2:
-                  list_q.append(previous_q[(nextState, q_act)])
-            if list_q.__len__() == 0:
-                previous_q_val = 0
+             list_q.append(previous_q[(nextState, q_act)])
+            if len(list_q) == 0:
+             previous_q_val = 0
             else:
-                previous_q_val = discount * max(list_q)
+             previous_q_val = discount * max(list_q)
             q_val = (reward + previous_q_val) * nextState[1]
 
           if max_val < sum:
